@@ -2,14 +2,16 @@ package fr.borntocode.lud00.voiceapplication;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
     private final int REQ_CODE_SPEECH_INPUT = 100;
     private Button launchPrompt;
+    private MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +59,13 @@ public class MainActivity extends AppCompatActivity {
                     String result = buffer.get(0);
 
                     Pattern ff = Pattern.compile("Final|fantasy");
-                    Log.e("onActivityResult", result);
                     if (ff.matcher(result).find()) {
-                        Log.e("onActivityResult", "ok");
+                        try {
+                            preparePlayer("ffx-victory.mp3");
+                            player.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
@@ -67,4 +74,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    public void preparePlayer(String path) throws IOException {
+        AssetFileDescriptor afd = getAssets().openFd(path);
+        player = new MediaPlayer();
+        player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        player.prepare();
+    }
+
+    @Override
+    protected void onStop() {
+        if(player.isPlaying()) {
+            player.stop();
+        }
+        super.onStop();
+    }
+
 }
