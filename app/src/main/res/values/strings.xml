@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">VoiceApplication</string>
     <string name="prompt_text">Reconnaissance vocale</string>
+    <string name="read_text">Synthèse vocale</string>
 </resources>

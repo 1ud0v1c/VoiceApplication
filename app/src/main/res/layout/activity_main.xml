@@ -16,7 +16,20 @@
         android:layout_height="wrap_content"
         android:text="@string/prompt_text"
         android:drawableLeft="@drawable/microphone"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="158dp" />
+
+    <Button
+        android:id="@+id/readText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/read_text"
+        android:drawableLeft="@drawable/book"
+        android:layout_below="@+id/launchPrompt"
+        android:layout_alignLeft="@+id/launchPrompt"
+        android:layout_alignStart="@+id/launchPrompt"
+        android:layout_alignRight="@+id/launchPrompt"
+        android:layout_alignEnd="@+id/launchPrompt" />
 
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,8 +19,12 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    private Button launchPrompt;
+    private final int CHECK_CODE = 0x1;
+    private final int SHORT_DURATION = 1000;
+
+    private Button launchPrompt, readText;
     private MediaPlayer player;
+    private Speaker speaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +33,30 @@ public class MainActivity extends AppCompatActivity {
 
         launchPrompt = (Button) findViewById(R.id.launchPrompt);
         launchPrompt.setOnClickListener(promptListener);
+
+        readText = (Button) findViewById(R.id.readText);
+        readText.setOnClickListener(readListener);
+
+        checkTTS();
+    }
+
+    private void checkTTS(){
+        Intent check = new Intent();
+        check.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(check, CHECK_CODE);
     }
 
     View.OnClickListener promptListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             promptSpeechInput();
+        }
+    };
+
+    View.OnClickListener readListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            speakOut();
         }
     };
 
@@ -46,6 +69,14 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
             Toast.makeText(getApplicationContext(), "Désolé, votre appareil ne supporte pas d'entrée vocale...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void speakOut() {
+        String text = "Ceci est un test";
+        speaker.allow(true);
+        if(!speaker.isSpeaking()) {
+            speaker.speak(text);
         }
     }
 
@@ -70,6 +101,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             }
+            case CHECK_CODE: {
+                if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    speaker = new Speaker(this);
+                } else {
+                    Intent install = new Intent();
+                    install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    startActivity(install);
+                }
+            }
             default:
                 break;
         }
@@ -84,9 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        if(player.isPlaying()) {
-            player.stop();
+        if(player != null) {
+            if(player.isPlaying()) {
+                player.stop();
+            }
         }
+        speaker.destroy();
         super.onStop();
     }
 
