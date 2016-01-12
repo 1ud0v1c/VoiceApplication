@@ -3,16 +3,19 @@ package fr.borntocode.lud00.voiceapplication;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Vous pouvez parler ...");
+
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
@@ -73,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakOut() {
-        String text = "Ceci est un test";
         speaker.allow(true);
         if(!speaker.isSpeaking()) {
-            speaker.speak(text);
+            speaker.speak(readFile(R.raw.martin_luther_king));
+            speaker.pause(SHORT_DURATION);
         }
     }
 
@@ -131,6 +135,21 @@ public class MainActivity extends AppCompatActivity {
         }
         speaker.destroy();
         super.onStop();
+    }
+
+    private String readFile(int rawfile) {
+        String result = new String();
+        try {
+            Resources res = getResources();
+            InputStream input_stream = res.openRawResource(rawfile);
+
+            byte[] b = new byte[input_stream.available()];
+            input_stream.read(b);
+            result = new String(b);
+        } catch (Exception e) {
+            Log.e("readFile", e.getMessage());
+        }
+        return result;
     }
 
 }

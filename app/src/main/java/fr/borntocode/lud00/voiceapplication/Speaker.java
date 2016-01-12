@@ -5,13 +5,11 @@ import java.util.Locale;
 import android.content.Context;
 import android.media.AudioManager;
 
-import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
 public class Speaker implements OnInitListener {
     private static Locale language = Locale.FRANCE;
-    private static final String TAG = "TextToSpeechInitializer";
 
     private static TextToSpeech tts;
     private boolean isReady = false;
@@ -19,12 +17,14 @@ public class Speaker implements OnInitListener {
 
     public Speaker(Context context){
         tts = new TextToSpeech(context, this);
+        tts.setPitch(0.8f);
+        tts.setSpeechRate(0.9f);
     }
 
     @Override
     public void onInit(int status) {
         if(status == TextToSpeech.SUCCESS){
-            tts.setLanguage(Locale.FRANCE);
+            tts.setLanguage(language);
             isReady = true;
         } else{
             isReady = false;
@@ -33,9 +33,7 @@ public class Speaker implements OnInitListener {
 
     public void speak(String text){
         if(isReady && isAllowed) {
-            Bundle key = new Bundle();
-            key.putString("key",TextToSpeech.Engine.KEY_PARAM_STREAM);
-            tts.speak(text, TextToSpeech.QUEUE_ADD, key, String.valueOf(AudioManager.STREAM_NOTIFICATION));
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null, String.valueOf(AudioManager.STREAM_NOTIFICATION));
         }
     }
 
@@ -45,10 +43,6 @@ public class Speaker implements OnInitListener {
 
     public void setPitchRate(float pitchrate) {
         tts.setPitch(pitchrate);
-    }
-
-    public boolean isAllowed(){
-        return isAllowed;
     }
 
     public void allow(boolean allowed){
