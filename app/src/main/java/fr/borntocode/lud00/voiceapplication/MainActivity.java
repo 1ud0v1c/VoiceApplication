@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakOut() {
-        speaker.allow(true);
         if(!speaker.isSpeaking()) {
             speaker.speak(readFile(R.raw.martin_luther_king));
             speaker.pause(SHORT_DURATION);
@@ -124,6 +123,12 @@ public class MainActivity extends AppCompatActivity {
         player = new MediaPlayer();
         player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
         player.prepare();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        checkTTS();
     }
 
     @Override

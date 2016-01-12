@@ -13,7 +13,6 @@ public class Speaker implements OnInitListener {
 
     private static TextToSpeech tts;
     private boolean isReady = false;
-    private boolean isAllowed = false;
 
     public Speaker(Context context){
         tts = new TextToSpeech(context, this);
@@ -32,8 +31,8 @@ public class Speaker implements OnInitListener {
     }
 
     public void speak(String text){
-        if(isReady && isAllowed) {
-            tts.speak(text, TextToSpeech.QUEUE_ADD, null, String.valueOf(AudioManager.STREAM_NOTIFICATION));
+        if(isReady) {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null, null);
         }
     }
 
@@ -43,10 +42,6 @@ public class Speaker implements OnInitListener {
 
     public void setPitchRate(float pitchrate) {
         tts.setPitch(pitchrate);
-    }
-
-    public void allow(boolean allowed){
-        isAllowed = allowed;
     }
 
     public boolean isSpeaking() {
